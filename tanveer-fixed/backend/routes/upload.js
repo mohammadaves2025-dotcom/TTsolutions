@@ -2,14 +2,12 @@ import { Router } from 'express';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
-import { fileURLToPath } from 'url';
 import protect from '../middleware/auth.js';
 import { asyncHandler } from '../middleware/errorHandler.js';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const UPLOADS_DIR = path.join(__dirname, '..', 'uploads');
-
-// FIX: moved directory creation to an async-safe pattern rather than blocking sync call at module level
+// FIX: Use /tmp/uploads instead of __dirname/uploads
+// Vercel's /var/task filesystem is read-only — only /tmp is writable
+const UPLOADS_DIR = '/tmp/uploads';
 fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 
 const storage = multer.diskStorage({
@@ -65,4 +63,4 @@ router.post(
   })
 );
 
-export default router;
+export default router;  
